@@ -1,0 +1,71 @@
+object LoginForm: TLoginForm
+  Left = 440
+  Height = 240
+  Top = 176
+  Width = 320
+  Caption = 'Авторизация'
+  ClientHeight = 240
+  ClientWidth = 320
+  OnClose = FormClose
+  LCLVersion = '1.2.4.0'
+  object loginEdit: TLabeledEdit
+    Left = 54
+    Height = 27
+    Top = 76
+    Width = 191
+    EditLabel.AnchorSideLeft.Control = loginEdit
+    EditLabel.AnchorSideRight.Control = loginEdit
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = loginEdit
+    EditLabel.Left = 54
+    EditLabel.Height = 17
+    EditLabel.Top = 56
+    EditLabel.Width = 191
+    EditLabel.Caption = 'Имя пользователя:'
+    EditLabel.ParentColor = False
+    TabOrder = 0
+  end
+  object passEdit: TLabeledEdit
+    Left = 54
+    Height = 27
+    Top = 136
+    Width = 191
+    EditLabel.AnchorSideLeft.Control = passEdit
+    EditLabel.AnchorSideRight.Control = passEdit
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = passEdit
+    EditLabel.Left = 54
+    EditLabel.Height = 17
+    EditLabel.Top = 116
+    EditLabel.Width = 191
+    EditLabel.Caption = 'Пароль:'
+    EditLabel.ParentColor = False
+    TabOrder = 1
+  end
+  object enterBtn: TButton
+    Left = 54
+    Height = 24
+    Top = 174
+    Width = 191
+    Caption = 'Войти'
+    OnClick = enterBtnClick
+    TabOrder = 2
+  end
+  object registerBtn: TButton
+    Left = 56
+    Height = 24
+    Top = 200
+    Width = 189
+    Caption = 'Зарегистрироваться'
+    OnClick = registerBtnClick
+    TabOrder = 3
+  end
+  object SQLQuery: TSQLQuery
+    FieldDefs = <>
+    Database = DBData.IBConnection
+    Transaction = DBData.SQLTransaction
+    Params = <>
+    left = 24
+    top = 8
+  end
+end

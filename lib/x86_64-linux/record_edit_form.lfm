@@ -1,0 +1,47 @@
+object EditForm: TEditForm
+  Left = 911
+  Height = 62
+  Top = 310
+  Width = 390
+  HorzScrollBar.Page = 390
+  VertScrollBar.Page = 48
+  BorderStyle = bsDialog
+  Caption = 'EditForm'
+  ClientHeight = 0
+  ClientWidth = 0
+  LCLVersion = '1.2.2.0'
+  object BtnPanel: TButtonPanel
+    Left = 6
+    Height = 34
+    Top = 22
+    Width = 378
+    OKButton.Name = 'OKButton'
+    OKButton.Caption = 'Применить'
+    OKButton.DefaultCaption = False
+    OKButton.OnClick = OKButtonClick
+    HelpButton.Name = 'HelpButton'
+    HelpButton.DefaultCaption = True
+    CloseButton.Name = 'CloseButton'
+    CloseButton.DefaultCaption = True
+    CancelButton.Name = 'CancelButton'
+    CancelButton.Caption = 'Отмена'
+    CancelButton.DefaultCaption = False
+    CancelButton.OnClick = CancelButtonClick
+    ButtonOrder = boCloseCancelOK
+    TabOrder = 0
+    ShowButtons = [pbOK, pbCancel]
+  end
+  object Datasource: TDataSource
+    DataSet = RefForm.SQLQuery
+    left = 32
+    top = 8
+  end
+  object SQLQuery: TSQLQuery
+    FieldDefs = <>
+    Database = DBData.IBConnection
+    Transaction = DBData.SQLTransaction
+    Params = <>
+    left = 120
+    top = 8
+  end
+end

@@ -1,0 +1,45 @@
+object UsersForm: TUsersForm
+  Left = 446
+  Height = 245
+  Top = 249
+  Width = 438
+  Caption = 'Пользователи'
+  ClientHeight = 245
+  ClientWidth = 438
+  OnCreate = FormCreate
+  LCLVersion = '1.2.4.0'
+  object usersSG: TStringGrid
+    Left = 0
+    Height = 176
+    Top = 0
+    Width = 438
+    Align = alClient
+    TabOrder = 0
+  end
+  object buttonsPnl: TPanel
+    Left = 0
+    Height = 69
+    Top = 176
+    Width = 438
+    Align = alBottom
+    ClientHeight = 69
+    ClientWidth = 438
+    TabOrder = 1
+    object saveBtn: TButton
+      Left = 24
+      Height = 33
+      Top = 16
+      Width = 94
+      Caption = 'Сохранить'
+      TabOrder = 0
+    end
+  end
+  object SQLQuery: TSQLQuery
+    FieldDefs = <>
+    Database = DBData.IBConnection
+    Transaction = DBData.SQLTransaction
+    Params = <>
+    left = 368
+    top = 192
+  end
+end
