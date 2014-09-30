@@ -6,7 +6,7 @@ uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
   {$ENDIF}{$ENDIF}
-  Interfaces,
+  Interfaces, // this includes the LCL widgetset
   Forms, lazcontrols, main, reference_form, data, metadata, 
 search_frame, db_edit, search_filter_frame,
   record_edit_form, time_table_form, conflict_form, login, users_form, roles;
@@ -22,6 +22,7 @@ begin
   Application.CreateForm(TConflictForm, ConflictForm);
   Application.CreateForm(TLoginForm, LoginForm);
   Application.CreateForm(TUsersForm, UsersForm);
+  //Application.CreateForm(TEditForm, EditForm);
   Application.Run;
 end.
 
