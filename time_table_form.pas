@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, db, sqldb, FileUtil, Forms, Controls, Graphics, Dialogs,
   Grids, ExtCtrls, StdCtrls, Menus, Buttons, search_frame, search_filter_frame,
   metadata, math, lazregions, DbCtrls, types, record_edit_form,
-  reference_form, roles, comobj;
+  reference_form, comobj;
 
 type
 
@@ -42,7 +42,6 @@ type
     TopPanel: TPanel;
     FilterPanel: TPanel;
     procedure AddFilterBtnClick(Sender: TObject);
-    procedure CheckFieldsClick(Sender: TObject);
     procedure CheckFieldsItemClick(Sender: TObject; Index: integer);
     procedure CloseFilterClick(AFilterIndex: integer);
     procedure DrawGridDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -58,7 +57,6 @@ type
       Y: Integer);
     procedure DrawGridMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure FilterPanelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure HorizontalFieldBoxChange(Sender: TObject);
     procedure MExportClick(Sender: TObject);
@@ -89,7 +87,6 @@ type
     procedure AfterEditAction(Sender: TObject);
     procedure SaveToHTML(AFile: string);
     procedure SaveToExcel(AFile: string);
-    procedure SaveToCSV(AFile: string);
   private
     FTable, FMDTable: TTableInfo;
     FCellData: array of array of array of TStringList;
@@ -101,11 +98,6 @@ type
     FDragStartPos: TPoint;
     FFieldsCount, FDefaultRowHeight, FTextHeight: integer;
     FFilters: TFilters;
-    CellData: array of array of array of TStringList;
-    RecordIDs: array of array of array of integer;
-    CurVCI, CurHCI: integer;
-    ColTitles, RowTitles, FSQL: TStringList;
-    CurVCT, CurHCT, CurCol, CurRow: string;
   const
     FieldSelectionError: string = 'Поле по горизонтали совпадает с полем по вертикали';
   end;
@@ -180,8 +172,6 @@ end;
 procedure TTimeTable.DrawIcons(ACol, ARow, ATop: integer);
 var Rect: TRect;
 begin
-  if (not currentRoles.W) then
-    exit;
   if (FCurCol > 0) and (FCurRow > 0) and (FCurCol = aCol) and (FCurRow = aRow) and
      (FCurOrd > ATop) and (FCurOrd < ATop+FTextHeight*FFieldsCount)
   then begin
@@ -240,16 +230,15 @@ begin
             OnTriangleClick(self);
             Exit;
           end;
-        if currentRoles.W then begin
-          for i := 0 to high(FCellData[Col][Row]) do begin
-            if PtInRect(GetEditBtnRect(Col, Row, i), Point(X, Y)) then begin
-              OnEditBtnClick(FRecordIDs[Col][Row][i]);
-              Exit;
-            end;
-            if PtInRect(GetDeleteBtnRect(Col, Row, i), Point(X, Y)) then begin
-              OnDeleteBtnClick(FRecordIDs[Col][Row][i]);
-              Exit;
-            end;
+
+        for i := 0 to high(FCellData[Col][Row]) do begin
+          if PtInRect(GetEditBtnRect(Col, Row, i), Point(X, Y)) then begin
+            OnEditBtnClick(FRecordIDs[Col][Row][i]);
+            Exit;
+          end;
+          if PtInRect(GetDeleteBtnRect(Col, Row, i), Point(X, Y)) then begin
+            OnDeleteBtnClick(FRecordIDs[Col][Row][i]);
+            Exit;
           end;
         end;
       end;
@@ -263,11 +252,6 @@ begin
         end;
       end;
     end;
-end;
-
-procedure TTimeTable.FilterPanelClick(Sender: TObject);
-begin
-
 end;
 
 function TTimeTable.GetEditBtnRect(ACol, ARow, ARecordIndex: integer): TRect;
@@ -306,7 +290,7 @@ begin
   EditForm.ShowModal;
 end;
 
-procedure TTimeTable.OnDeleteBtnClick(ARecordID: integer);
+procedure TTimeTAble.OnDeleteBtnClick(ARecordID: integer);
 begin
   if Application.MessageBox('Вы действительно хотите удалить данную запись?',
      'Подтверждение', (4+48)) = 6
@@ -321,8 +305,6 @@ end;
 procedure TTimeTable.PMAddClick(Sender: TObject);
 var EditForm: TEditForm;
 begin
-  if not currentRoles.W then
-    exit;
   EditForm := TEditForm.Create(self, FMDTable, @AfterEditAction, [0, FCurMDHField, FCurMDVField]);
   with EditForm do begin
     FieldEdits[FCurMDHField].Value := FColTitleIDs[DrawGrid.Col-1];
@@ -376,7 +358,7 @@ procedure TTimeTable.DrawGridDragOver(Sender, Source: TObject; X, Y: Integer;
 var Col, Row: integer;
 begin
   DrawGrid.MouseToCell(X, Y, Col, Row);
-  Accept := (Col > 0) and (Row > 0) and currentRoles.W;
+  Accept := (Col > 0) and (Row > 0);
 end;
 
 procedure TTimeTable.DrawGridDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -494,7 +476,7 @@ end;
 procedure TTimeTable.GetCellData;
 var
   PrevCol, PrevRow, i: integer;
-  NCurCol, NCurRow: string;
+  CurCol, CurRow: string;
   CurCell: TStringList;
 begin
   SetLength(FCellData, DrawGrid.ColCount);
@@ -617,11 +599,6 @@ begin
       OnClose := @CloseFilterClick;
       FiltersBox.Height := FiltersBox.Height+Height;
     end;
-end;
-
-procedure TTimeTable.CheckFieldsClick(Sender: TObject);
-begin
-
 end;
 
 procedure TTimeTable.CloseFilterClick(AFilterIndex: integer);
@@ -851,39 +828,5 @@ begin
   writeln(f, '</table>' + #13#10 + '</body>');
   System.Close(f);
 end;
-
-procedure TTimeTable.SaveToCSV(AFile: string);
-var
-    f: text;
-    str, tmp: string;
-    i, j, k, q: integer;
-begin
-    System.Assign(f, UTF8ToSys(AFile));
-    Rewrite(f);
-    str := CurVCT + ',';
-    for i := 0 to ColTitles.Count-1 do
-        str += ColTitles.Strings[i] + ',';
-    Delete(str, Length(str) - 0, 1);
-    str += #13;
-    write(f, str);
-    for i := 0 to RowTitles.Count-1 do begin
-        str := RowTitles.Strings[i] + ',';
-        write(f, str);
-        for j := 0 to ColTitles.Count-1 do begin
-            tmp := '"';
-            for k := 0 to high(CellData[j][i]) do begin
-                for q := 0 to CellData[j][i][k].Count-1 do begin
-                    tmp += CellData[j][i][k].Strings[q] + #13#10;
-                end;
-            end;
-            write(f, tmp + '"');
-            if j <> ColTitles.Count-1 then write(f, ',');
-
-        end;
-        write(f, #13);
-    end;
-    System.Close(f);
-end;
-
 
 end.
